@@ -115,16 +115,22 @@ namespace PhotoTagger
             var nextJpg = _metaData.Contents[position];
 
             byte[] jpgBytes;
-            if (!File.Exists(nextJpg.Name))
+            var cachePath = nextJpg.Path.TrimStart('/');
+            var cacheDirectory = System.IO.Path.GetDirectoryName(cachePath);
+            if (!Directory.Exists(cacheDirectory))
+                Directory.CreateDirectory(cacheDirectory);
+
+            if (!File.Exists(cachePath))
             {
                 var tcs = new TaskCompletionSource<byte[]>();
                 _client.GetThumbnailAsync(nextJpg.Path, ThumbnailSize.ExtraLarge, bs => tcs.SetResult(bs), e => tcs.SetException(e));
                 jpgBytes = await tcs.Task;
-                File.WriteAllBytes(nextJpg.Name, jpgBytes);
+
+                File.WriteAllBytes(cachePath, jpgBytes);
             }
             else
             {
-                jpgBytes = File.ReadAllBytes(nextJpg.Name);
+                jpgBytes = File.ReadAllBytes(cachePath);
             }
 
             return jpgBytes;
