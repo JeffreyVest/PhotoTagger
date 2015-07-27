@@ -3,6 +3,7 @@ using DropNet.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -109,7 +110,7 @@ namespace PhotoTagger
             _position--;
             LoadImageIntoControl(await GetImage(_position));
         }
-        
+
         private async Task<byte[]> GetImage(int position)
         {
             var nextJpg = _metaData.Contents[position];
@@ -143,7 +144,67 @@ namespace PhotoTagger
             image.Source = LoadImage(jpgBytes);
             prevButton.IsEnabled = (_position != 0);
             nextButton.IsEnabled = (_position != _metaData.Contents.Count - 1);
+            tagsInput.Focus();
         }
 
+        private List<string> _tags;
+        private bool _consumeTextChanged;
+
+        private void tagsInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_consumeTextChanged)
+            {
+                _consumeTextChanged = false;
+                return;
+            }
+
+            if (_tags == null)
+            {
+                _tags = new List<string>();
+                _tags.Add("Hello");
+            }
+
+            var testString = tagsInput.Text.Substring(0, tagsInput.CaretIndex);
+            if (testString != "")
+            {
+                var tag = _tags.FirstOrDefault(t => t.StartsWith(testString));
+                if (tag != null)
+                {
+                    var pos = tagsInput.CaretIndex;
+                    if (tagsInput.Text != tag)
+                    {
+                        ChangeText(tag);
+                        tagsInput.CaretIndex = pos;
+                    }
+                }
+            }
+            else
+            {
+                ChangeText("");
+            }
+
+        }
+
+        private void tagsInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Tab)
+            {
+                e.Handled = true;
+                ChangeText(tagsInput.Text + " ");
+                tagsInput.CaretIndex = tagsInput.Text.Length;
+            }
+        }
+
+        private void ChangeText(string text)
+        {
+            if (_consumeTextChanged) return;
+
+            if (text != tagsInput.Text)
+            {
+                _consumeTextChanged = true;
+                tagsInput.Text = text;
+            }
+        }
     }
+
 }

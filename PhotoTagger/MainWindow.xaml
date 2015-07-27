@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PhotoTagger"
         mc:Ignorable="d"
-        Title="Photo Tagger" Height="500" Width="600" Loaded="Window_Loaded">
+        Title="Photo Tagger" Height="500" Width="600" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid x:Name="dropboxPermissionsPanel" Visibility="Hidden">
             <Grid.RowDefinitions>
@@ -26,10 +26,16 @@
             </Grid.RowDefinitions>
             <TextBlock x:Name="metaDataText" Grid.Row="0"></TextBlock>
             <Image x:Name="image" Grid.Row="1"></Image>
-            <StackPanel Orientation="Horizontal" Grid.Row="2">
-                <Button x:Name="prevButton" Click="prevButton_Click"  Width="60px" Height="40px" IsEnabled="False">Prev</Button>
-                <Button x:Name="nextButton" Click="nextButton_Click" Width="60px" Height="40px">Next</Button>
-            </StackPanel>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10*"></ColumnDefinition>
+                    <ColumnDefinition Width="10*"></ColumnDefinition>
+                    <ColumnDefinition Width="80*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="prevButton" Click="prevButton_Click" IsEnabled="False" Grid.Column="0">Prev</Button>
+                <Button x:Name="nextButton" Click="nextButton_Click" Grid.Column="1">Next</Button>
+                <TextBox x:Name="tagsInput" FontSize="15" Grid.Column="2" TextChanged="tagsInput_TextChanged" KeyDown="tagsInput_KeyDown"></TextBox>
+            </Grid>
         </Grid>
     </Grid>
 
