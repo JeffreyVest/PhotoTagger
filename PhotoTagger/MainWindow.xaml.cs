@@ -149,6 +149,7 @@ namespace PhotoTagger
 
         private List<string> _tags;
         private bool _consumeTextChanged;
+        private int _lastTextLength;
 
         private void tagsInput_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -162,26 +163,29 @@ namespace PhotoTagger
             {
                 _tags = new List<string>();
                 _tags.Add("Hello");
+                _tags.Add("GoodBye");
             }
 
-            var testString = tagsInput.Text.Substring(0, tagsInput.CaretIndex);
-            if (testString != "")
+            var currentLength = tagsInput.Text.Length;
+            if (currentLength > _lastTextLength)
             {
-                var tag = _tags.FirstOrDefault(t => t.StartsWith(testString));
-                if (tag != null)
+                var tags = tagsInput.Text.Split(' ');
+                var testString = tagsInput.Text.Split(' ').Last();
+                if (testString != "")
                 {
-                    var pos = tagsInput.CaretIndex;
-                    if (tagsInput.Text != tag)
+                    var tag = _tags.FirstOrDefault(t => t.StartsWith(testString, StringComparison.CurrentCultureIgnoreCase));
+                    if (tag != null)
                     {
-                        ChangeText(tag);
-                        tagsInput.CaretIndex = pos;
+                        tags[tags.Length - 1] = tag;
+                        var fillLength = tag.Length - testString.Length;
+                        ChangeText(string.Join(" ", tags));
+                        tagsInput.CaretIndex = tagsInput.Text.Length;
+                        tagsInput.Select(tagsInput.Text.Length - fillLength, fillLength);
                     }
                 }
             }
-            else
-            {
-                ChangeText("");
-            }
+
+            _lastTextLength = tagsInput.Text.Length - tagsInput.SelectionLength;
 
         }
 
